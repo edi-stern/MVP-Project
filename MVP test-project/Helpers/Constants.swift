@@ -9,6 +9,6 @@ import Foundation
 
 class Constants {
     static let basePath = "https://imdb-api.com/en/API/"
-    static let apiKey = "k_pmjfva0w" //"k_jve4hz4s"
+    static let apiKey = "k_jve4hz4s" //"k_jve4hz4s" "k_pmjfva0w"
 
 }

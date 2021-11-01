@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SDWebImage
 
 class MovieCell: UITableViewCell {
 
@@ -20,15 +21,16 @@ class MovieCell: UITableViewCell {
     private lazy var descriptionLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = UIFont.boldSystemFont(ofSize: 14)
+        label.font = UIFont.systemFont(ofSize: 14)
         label.numberOfLines = 0
         return label
     }()
 
-    private lazy var iconView: UIImageView = {
+    private lazy var posterView: UIImageView = {
         let imageView = UIImageView()
         imageView.layer.cornerRadius = 8
         imageView.contentMode = .scaleAspectFit
+        imageView.image = UIImage(named: "loadding-spinner.pdf")
 
         return imageView
     }()
@@ -44,7 +46,7 @@ class MovieCell: UITableViewCell {
     }()
 
     private lazy var mainStackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [iconView, horizontalStackView])
+        let stackView = UIStackView(arrangedSubviews: [posterView, horizontalStackView])
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.alignment = .center
         stackView.distribution = .fill
@@ -52,8 +54,8 @@ class MovieCell: UITableViewCell {
         stackView.spacing = 12
 
         NSLayoutConstraint.activate([
-            iconView.widthAnchor.constraint(equalToConstant: 100),
-            iconView.heightAnchor.constraint(equalToConstant: 80)
+            posterView.widthAnchor.constraint(equalToConstant: 120),
+            posterView.heightAnchor.constraint(equalToConstant: 100)
         ])
 
         return stackView
@@ -76,17 +78,10 @@ class MovieCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    override func prepareForReuse() {
-        super.prepareForReuse()
-
-        iconView.image = nil
-    }
-
     func update(item: Movie) {
         titleLabel.text = "\(item.title)"
         descriptionLabel.text = "\(item.description)"
-        DispatchQueue.main.async {
-            self.iconView.loadThumbnail(urlSting: item.image)
-        }
+        posterView.sd_setImage(with: URL(string: item.image),
+                               placeholderImage: UIImage(named: "placeholder.png"))
     }
 }

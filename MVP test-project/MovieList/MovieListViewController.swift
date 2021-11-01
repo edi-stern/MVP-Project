@@ -9,7 +9,7 @@ import UIKit
 
 class MovieListViewController: UIViewController {
 
-    lazy var viewModel = MoviesViewModel(moviesListService: MoviesListService())
+    lazy var viewModel = MoviesViewModel(moviesListService: MoviesListService(), databaseService: DatabaseService())
     var selectedItem : Movie?
 
     @IBOutlet weak var tableView: UITableView!
@@ -23,7 +23,14 @@ class MovieListViewController: UIViewController {
         title = "Movies"
 
         tableView.register(MovieCell.self, forCellReuseIdentifier: "cellId")
-        tableView.rowHeight = 116
+        tableView.rowHeight = 136
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+
+        viewModel.viewWillAppear()
+        searchBar.text = ""
     }
 
     func showAlert(title: String, message: String) {
@@ -61,7 +68,7 @@ extension MovieListViewController: MoviesViewModelDelegate {
 
 extension MovieListViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.searchResults?.count ?? 0
+        return viewModel.searchResults.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -69,20 +76,15 @@ extension MovieListViewController: UITableViewDelegate, UITableViewDataSource {
             return UITableViewCell()
         }
 
-        guard let item = viewModel.searchResults?[indexPath.row] else {
-            return c
-        }
-        c.update(item: item)
+        c.update(item: viewModel.searchResults[indexPath.row])
 
         return c
     }
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        guard let item = viewModel.searchResults?[indexPath.row] else {
-            return
-        }
-        selectedItem = item
+
+        selectedItem = viewModel.searchResults[indexPath.row]
 
         performSegue(withIdentifier: "showMovieDetails", sender: self)
     }
@@ -95,6 +97,16 @@ extension MovieListViewController: UISearchBarDelegate {
         }
         viewModel.getMoviesList(word)
         view.endEditing(true)
+    }
+
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        viewModel.getMoviesList("")
+    }
+
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if let text = searchBar.text, text.isEmpty {
+            viewModel.getMoviesList("")
+        }
     }
 }
 

@@ -19,11 +19,18 @@ struct Movie: Codable {
 }
 
 struct MovieDetails: Codable {
-    let id: String?
+    let id: String
     let title: String?
     let fullTitle: String?
     let plot: String?
     let errorMessage: String?
     let image: String?
     let imDbRating: String?
+
+    var movie: Movie {
+        return Movie(id: id,
+                     image: image ?? "",
+                     title: title ?? "Missing",
+                     description: plot ?? "Missing")
+    }
 }
